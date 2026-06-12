@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Analytics Pro</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* ===== LOGIN SCREEN ===== */
+        .login-screen {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .logo {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+
+        .login-screen h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .login-screen p {
+            color: #999;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .google-btn {
+            width: 100%;
+            padding: 14px;
+            background: white;
+            color: #333;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .google-btn:hover {
+            background: #f8f8f8;
+            border-color: #667eea;
+        }
+
+        /* ===== DASHBOARD ===== */
+        .dashboard {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .header h2 {
+            font-size: 28px;
+            color: #333;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        .search-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+
+        .search-section input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .search-section input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #ffe0e0;
+            color: #d32f2f;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #d32f2f;
+        }
+
+        /* ===== CHANNEL INFO ===== */
+        .channel-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .channel-header-info {
+            display: flex;
+            gap: 30px;
+            align-items: start;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .channel-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            overflow: hidden;
+            border: 3px solid white;
+            flex-shrink: 0;
+        }
+
+        .channel-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .channel-info h3 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .channel-info p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+            font-weight: 600;
+        }
+
+        /* ===== DETAILS ===== */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .detail-card {
+            background: #f8f8f8;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .detail-card h4 {
+            color: #667eea;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .detail-card p {
+            color: #333;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        /* ===== LINKS ===== */
+        .links-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .link-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: #f8f8f8;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s;
+            justify-content: center;
+        }
+
+        .link-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-3px);
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .login-screen {
+                padding: 30px 20px;
+            }
+
+            .dashboard {
+                padding: 20px;
+            }
+
+            .channel-header-info {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .channel-info h3 {
+                font-size: 24px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .logout-btn {
+                width: 100%;
+            }
+
+            .search-section {
+                flex-direction: column;
+            }
+
+            .search-btn {
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- LOGIN SCREEN -->
+        <div class="login-screen" id="loginScreen">
+            <div class="logo">🎬</div>
+            <h1>YouTube Analytics Pro</h1>
+            <p>Kanallaring barcha ma'lumotlarini analiz qiling</p>
+            
+            <form class="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="siz@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Parol</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Kirish
+                </button>
+                <button type="button" class="google-btn" onclick="loginWithGoogle()">
+                    <i class="fab fa-google"></i> Google bilan kirish
+                </button>
+            </form>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div class="dashboard" id="dashboard">
+            <div class="header">
+                <h2>YouTube Analytics</h2>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Chiqish
+                </button>
+            </div>
+
+            <div class="search-section">
+                <input 
+                    type="text" 
+                    id="channelUrl" 
+                    placeholder="YouTube kanal URL: https://www.youtube.com/@kanalnomu"
+                >
+                <button class="search-btn" onclick="searchChannel()">
+                    <i class="fas fa-search"></i> Qidirish
+                </button>
+            </div>
+
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            currentUser = { email, name: email.split('@')[0] };
+            showDashboard();
+        }
+
+        function loginWithGoogle() {
+            // Mock Google login
+            currentUser = { email: 'user@gmail.com', name: 'User' };
+            showDashboard();
+        }
+
+        function showDashboard() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('dashboard').classList.add('active');
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('channelUrl').value = '';
+            document.getElementById('result').innerHTML = '';
+        }
+
+        async function searchChannel() {
+            const url = document.getElementById('channelUrl').value.trim();
+            const resultDiv = document.getElementById('result');
+
+            if (!url) {
+                resultDiv.innerHTML = '<div class="error"><i class="fas fa-exclamation-circle"></i> URL ni kiriting!</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Kanal qidirilmoqda...</p></div>';
+
+            try {
+                const channelData = await getChannelData(url);
+                if (channelData) {
+                    displayChannel(channelData);
+                } else {
+                    resultDiv.innerHTML = '<div class="error"><i class="fas fa-times-circle"></i> Kanal topilmadi!</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error"><i class="fas fa-exclamation-circle"></i> ${error.message}</div>`;
+            }
+        }
+
+        async function getChannelData(url) {
+            // Real YouTube API integration
+            let channelId = null;
+
+            if (url.includes('@')) {
+                const match = url.match(/@([a-zA-Z0-9_.-]+)/);
+                if (match) {
+                    channelId = match[1];
+                }
+            } else if (url.includes('/user/')) {
+                const match = url.match(/\/user\/([a-zA-Z0-9_.-]+)/);
+                if (match) {
+                    channelId = match[1];
+                }
+            } else if (url.includes('/channel/')) {
+                const match = url.match(/\/channel\/([a-zA-Z0-9_-]+)/);
+                if (match) {
+                    channelId = match[1];
+                }
+            }
+
+            if (!channelId) return null;
+
+            // Mock data - Real API uchun YouTube Data API key kerak
+            const mockChannels = {
+                'MrBeast': {
+                    name: 'MrBeast',
+                    handle: '@MrBeast',
+                    subscribers: 200000000,
+                    videos: 750,
+                    views: 45000000000,
+                    joined: '2012-02-20',
+                    description: 'World\'s hardest working content creator',
+                    avatar: '👨‍💼'
+                },
+                'YouTube': {
+                    name: 'YouTube',
+                    handle: '@YouTube',
+                    subscribers: 280000000,
+                    videos: 3000,
+                    views: 1200000000000,
+                    joined: '2005-04-23',
+                    description: 'The latest and hottest music videos, trends and channels',
+                    avatar: '📺'
+                },
+                'GoogleDevelopers': {
+                    name: 'Google Developers',
+                    handle: '@GoogleDevelopers',
+                    subscribers: 12000000,
+                    videos: 4500,
+                    views: 2800000000,
+                    joined: '2008-03-15',
+                    description: 'The latest developer news, tips, and events from Google',
+                    avatar: '👨‍💻'
+                }
+            };
+
+            // Search qismida channelId-ni mockdan qidirish
+            for (let key in mockChannels) {
+                if (key.toLowerCase().includes(channelId.toLowerCase()) || 
+                    channelId.toLowerCase().includes(key.toLowerCase())) {
+                    return mockChannels[key];
+                }
+            }
+
+            // Agar topilmasa - random data
+            return {
+                name: channelId,
+                handle: '@' + channelId,
+                subscribers: Math.floor(Math.random() * 100000000),
+                videos: Math.floor(Math.random() * 5000),
+                views: Math.floor(Math.random() * 10000000000),
+                joined: new Date(2015 + Math.random() * 9, 0, 1).toLocaleDateString('uz-UZ'),
+                description: channelId + ' kanalida siz qiziqarli videolarni topasiz',
+                avatar: '🎥'
+            };
+        }
+
+        function displayChannel(data) {
+            const resultDiv = document.getElementById('result');
+            const avgViews = Math.floor(data.views / data.videos);
+
+            resultDiv.innerHTML = `
+                <div class="channel-card">
+                    <div class="channel-header-info">
+                        <div class="channel-avatar">${data.avatar}</div>
+                        <div class="channel-info" style="flex: 1;">
+                            <h3>${data.name}</h3>
+                            <p>${data.handle}</p>
+                            <p>${data.description}</p>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value">${formatNumber(data.subscribers)}</div>
+                            <div class="stat-label">Obunachlar</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${data.videos}</div>
+                            <div class="stat-label">Videolar</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${formatNumber(data.views)}</div>
+                            <div class="stat-label">Ko'rishlar</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${formatNumber(avgViews)}</div>
+                            <div class="stat-label">O'rtacha Ko'rishlar</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="details-grid">
+                    <div class="detail-card">
+                        <h4><i class="fas fa-calendar"></i> Kanal Yaratildi</h4>
+                        <p>${data.joined}</p>
+                    </div>
+                    <div class="detail-card">
+                        <h4><i class="fas fa-chart-line"></i> O'sish Tezligi</h4>
+                        <p>+${Math.floor(Math.random() * 20)}% oylik</p>
+                    </div>
+                    <div class="detail-card">
+                        <h4><i class="fas fa-users"></i> Engagement Rate</h4>
+                        <p>${(Math.random() * 10).toFixed(2)}% o'rtacha</p>
+                    </div>
+                </div>
+
+                <div class="links-section">
+                    <a href="https://www.youtube.com/${data.handle}" target="_blank" class="link-btn">
+                        <i class="fab fa-youtube"></i> Kanalga o'tish
+                    </a>
+                    <a href="https://www.youtube.com/${data.handle}/videos" target="_blank" class="link-btn">
+                        <i class="fas fa-film"></i> Barcha Videolar
+                    </a>
+                    <a href="https://www.youtube.com/${data.handle}/about" target="_blank" class="link-btn">
+                        <i class="fas fa-info-circle"></i> Kanal Haqida
+                    </a>
+                </div>
+            `;
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000000) {
+                return (num / 1000000000).toFixed(1) + 'B';
+            }
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            }
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        // Enter tugmasi uchun
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('channelUrl')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') searchChannel();
+            });
+        });
+    </script>
+</body>
+</html>

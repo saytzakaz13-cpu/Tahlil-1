@@ -1107,7 +1107,7 @@
             document.getElementById('channelUrl').value = '';
         }
 
-        // ===== ANALYSIS FUNCTIONS =====
+        // ===== ANALYSIS FUNCTIONS (YOUTUBE API INTEGRATION) =====
         async function analyzeChannel() {
             if (!currentUser) {
                 openAuthModal();
@@ -1137,50 +1137,54 @@
         }
 
         async function getChannelAnalytics(url) {
-            let channelId = null;
+            const API_KEY = 'AIzaSyBbn4WaY9Guj0RUSbIXuqylPNOxbVyNNi4';
+            let apiUrl = '';
 
+            // URL dan ID yoki Handle ni ajratib olish
             if (url.includes('@')) {
-                const match = url.match(/@([a-zA-Z0-9_.-]+)/);
-                channelId = match ? match[1] : null;
+                const handle = url.match(/@([a-zA-Z0-9_.-]+)/)[1];
+                apiUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&forHandle=${handle}&key=${API_KEY}`;
             } else if (url.includes('/user/')) {
-                const match = url.match(/\/user\/([a-zA-Z0-9_.-]+)/);
-                channelId = match ? match[1] : null;
+                const username = url.match(/\/user\/([a-zA-Z0-9_.-]+)/)[1];
+                apiUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&forUsername=${username}&key=${API_KEY}`;
             } else if (url.includes('/channel/')) {
-                const match = url.match(/\/channel\/([a-zA-Z0-9_-]+)/);
-                channelId = match ? match[1] : null;
+                const channelId = url.match(/\/channel\/([a-zA-Z0-9_-]+)/)[1];
+                apiUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${channelId}&key=${API_KEY}`;
+            } else {
+                throw new Error("Invalid YouTube URL format. Please use @handle, /channel/ID, or /user/username");
             }
 
-            if (!channelId) return null;
-
-            // Mock data (Real API integration needed)
-            const mockChannels = {
-                'mrbeast': { name: 'MrBeast', subs: 200000000, videos: 750, views: 45000000000 },
-                'youtube': { name: 'YouTube', subs: 280000000, videos: 3000, views: 1200000000000 },
-                'googledevelopers': { name: 'Google Developers', subs: 12000000, videos: 4500, views: 2800000000 }
-            };
-
-            const key = Object.keys(mockChannels).find(k => channelId.toLowerCase().includes(k) || k.includes(channelId.toLowerCase()));
+            // API ga so'rov yuborish
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error("Network response was not ok or API quota exceeded.");
             
-            if (key) {
-                return mockChannels[key];
+            const data = await response.json();
+            
+            if (!data.items || data.items.length === 0) {
+                return null;
             }
 
+            const channel = data.items[0];
             return {
-                name: channelId,
-                subs: Math.floor(Math.random() * 100000000),
-                videos: Math.floor(Math.random() * 5000),
-                views: Math.floor(Math.random() * 10000000000)
+                name: channel.snippet.title,
+                subs: parseInt(channel.statistics.subscriberCount || 0),
+                videos: parseInt(channel.statistics.videoCount || 0),
+                views: parseInt(channel.statistics.viewCount || 0),
+                avatar: channel.snippet.thumbnails.high.url,
+                publishedAt: channel.snippet.publishedAt
             };
         }
 
         function displayAnalysis(data) {
             const resultDiv = document.getElementById('analysisResult');
-            const avgViews = Math.floor(data.views / data.videos);
+            const avgViews = data.videos > 0 ? Math.floor(data.views / data.videos) : 0;
 
             resultDiv.innerHTML = `
                 <div class="channel-card">
                     <div class="channel-header">
-                        <div class="channel-avatar"><i class="fas fa-play-circle" style="color: white;"></i></div>
+                        <div class="channel-avatar">
+                            <img src="${data.avatar}" alt="${data.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
                         <div class="channel-info">
                             <h2>${data.name}</h2>
                             <p>Comprehensive channel analytics and insights</p>
@@ -1192,7 +1196,7 @@
                             <div class="stat-label">Subscribers</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-value">${data.videos}</div>
+                            <div class="stat-value">${formatNumber(data.videos)}</div>
                             <div class="stat-label">Videos</div>
                         </div>
                         <div class="stat-item">
@@ -1216,29 +1220,29 @@
                     <div class="details-grid">
                         <div class="detail-card">
                             <h4><i class="fas fa-calendar"></i> Channel Created</h4>
-                            <p>${new Date(2015 + Math.random() * 9, 0, 1).toLocaleDateString()}</p>
+                            <p>${new Date(data.publishedAt).toLocaleDateString()}</p>
                         </div>
                         <div class="detail-card">
                             <h4><i class="fas fa-chart-line"></i> Monthly Growth</h4>
-                            <p>+${Math.floor(Math.random() * 20)}%</p>
+                            <p>Data via API</p>
                         </div>
                         <div class="detail-card">
                             <h4><i class="fas fa-users"></i> Engagement Rate</h4>
-                            <p>${(Math.random() * 10).toFixed(2)}%</p>
+                            <p>Analyzing...</p>
                         </div>
                     </div>
                 </div>
 
                 <div id="analytics" class="tab-content">
                     <div class="chart-container">
-                        <div class="chart-title">Views Over Time</div>
+                        <div class="chart-title">Estimated Views Over Time</div>
                         <canvas id="viewsChart"></canvas>
                     </div>
                 </div>
 
                 <div id="performance" class="tab-content">
                     <div class="chart-container">
-                        <div class="chart-title">Subscriber Growth</div>
+                        <div class="chart-title">Estimated Subscriber Growth</div>
                         <canvas id="growthChart"></canvas>
                     </div>
                 </div>
@@ -1253,7 +1257,7 @@
             // Views Chart
             const viewsCanvas = document.getElementById('viewsChart');
             if (viewsCanvas) {
-                const monthlyData = Array.from({ length: 12 }, () => Math.floor(Math.random() * data.views / 100));
+                const monthlyData = Array.from({ length: 12 }, () => Math.floor((Math.random() * 0.1 + 0.9) * data.views / 12));
                 new Chart(viewsCanvas, {
                     type: 'line',
                     data: {
@@ -1284,7 +1288,7 @@
             // Growth Chart
             const growthCanvas = document.getElementById('growthChart');
             if (growthCanvas) {
-                const growthData = Array.from({ length: 12 }, (_, i) => Math.floor(data.subs * (0.5 + i * 0.04)));
+                const growthData = Array.from({ length: 12 }, (_, i) => Math.floor(data.subs * (0.8 + i * 0.02)));
                 new Chart(growthCanvas, {
                     type: 'bar',
                     data: {
@@ -1302,7 +1306,7 @@
                         responsive: true,
                         plugins: { legend: { display: true } },
                         scales: {
-                            y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' } },
+                            y: { beginAtZero: false, grid: { color: 'rgba(0, 0, 0, 0.05)' } },
                             x: { grid: { color: 'rgba(0, 0, 0, 0.05)' } }
                         }
                     }
@@ -1320,7 +1324,7 @@
         function handleVideoUpload(event) {
             const file = event.target.files[0];
             if (file) {
-                alert(`Video "${file.name}" ready to upload! (Demo mode - requires YouTube API)`);
+                alert(`Video "${file.name}" ready to upload! (Demo mode - requires YouTube API OAuth token to publish)`);
             }
         }
 

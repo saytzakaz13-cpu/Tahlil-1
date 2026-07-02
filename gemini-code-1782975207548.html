@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTubeFlow Pro - Dashboard</title>
+    <!-- FontAwesome Ikonkalar uchun -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Grafiklar uchun Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        /* ASOSIY DIZAYN VA RANG PALITRASI (O'zgarmagan) */
+        :root {
+            --bg-main: #0b0c10;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --accent-color: #ff0055;
+            --accent-hover: #ff3377;
+            --text-main: #ffffff;
+            --text-muted: #aaaaaa;
+            --success-color: #00ff64;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            color: var(--accent-color);
+        }
+
+        /* ANIMATSIYALAR */
+        .animate-slideUp {
+            animation: slideUp 0.6s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* MULTI-FUNCTIONAL TOOLS HUB (SEO & THUMBNAIL) - TEGILMAGAN */
+        .tools-hub-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .tools-hub-section h2 {
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tab-navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Form elementlari stilizatsiyasi */
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 12px 15px;
+            border-radius: 8px;
+            color: white;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-color);
+        }
+
+        button.action-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        button.action-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .result-box {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px dashed var(--border-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            min-height: 50px;
+        }
+
+        /* YANGI QO'SHILGAN VALUE, GRAFIK VA DEMO REPORT GRIDI */
+        .dashboard-analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        .pro-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .pro-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 1. Nega Biz Blok Stillari */
+        .benefits-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .benefit-item i {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            margin-top: 3px;
+        }
+
+        .benefit-item p {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            color: #dddddd;
+        }
+
+        /* 2. Live Grafik Blok Stillari */
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .badge-live {
+            background: rgba(0, 255, 100, 0.12);
+            color: var(--success-color);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success-color);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* 3. AI Demo Report Stillari */
+        .sample-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .sample-report-box {
+            background: rgba(255, 0, 85, 0.04);
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            border-radius: 0 10px 10px 0;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .report-meta-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+        }
+
+        .report-tag {
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .report-impact {
+            background: #ff3b30;
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .report-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #eeeeee;
+            margin-bottom: 12px;
+        }
+
+        .report-footer-growth {
+            font-size: 0.85rem;
+            color: var(--success-color);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Dinamik Pulsatsiya Animatsiyasi */
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        /* Mobil qurilmalarga moslashuvchanlik */
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+            button.action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container animate-slideUp">
+    
+    <!-- HEADER LOGO -->
+    <header>
+        <div class="logo"><i class="fab fa-youtube"></i> YouTubeFlow <span>Pro</span></div>
+        <div style="font-size: 0.9rem; color: var(--text-muted);">Xush kelibsiz, <strong style="color:white">shoX dev</strong></div>
+    </header>
+
+    <!-- 1. MULTI-FUNCTIONAL TOOLS HUB (SEO, Thumbnail va boshqalar - To'liq saqlangan) -->
+    <section class="tools-hub-section">
+        <h2><i class="fas fa-tools" style="color: var(--accent-color);"></i> Pro Tools Hub</h2>
+        
+        <!-- Tab Navigatsiyasi -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="openTab(event, 'seo-tab')"><i class="fas fa-search"></i> SEO Analiz</button>
+            <button class="tab-btn" onclick="openTab(event, 'thumbnail-tab')"><i class="fas fa-image"></i> Thumbnail Yuklash</button>
+            <button class="tab-btn" onclick="openTab(event, 'tags-tab')"><i class="fas fa-tags"></i> Tag Generator</button>
+        </div>
+
+        <!-- SEO Analiz Bo'limi -->
+        <div id="seo-tab" class="tab-content active">
+            <p style="margin-bottom: 12px; color: var(--text-muted);">Video havolasini kiriting va uning SEO ko'rsatkichlarini lahzada tekshiring.</p>
+            <div class="input-group">
+                <input type="text" id="seo-input" placeholder="https://www.youtube.com/watch?v=...">
+                <button class="action-btn" onclick="runSeoAnalysis()">Analiz qilish</button>
+            </div>
+            <div class="result-box" id="seo-result">Natija bu yerda ko'rinadi...</div>
+        </div>
+
+        <!-- Thumbnail Yuklash Bo'limi -->
+        <div id="thumbnail-tab" class="tab-content">
+            <p style="margin-bottom: 12px; color: var(--text-muted);">Istalgan YouTube videosining muqova tasvirini (Thumbnail) yuqori sifatda yuklab oling.</p>
+            <div class="input-group">
+                <input type="text" id="thumb-input" placeholder="Video havolasi yoki ID kiriting">
+                <button class="action-btn" onclick="fetchThumbnail()">Rasm topish</button>
+            </div>
+            <div class="result-box" id="thumb-result">Rasm havola holatida bu yerda yuklanadi...</div>
+        </div>
+
+        <!-- Tag Generator Bo'limi -->
+        <div id="tags-tab" class="tab-content">
+            <p style="margin-bottom: 12px; color: var(--text-muted);">Mavzuingizga mos eng ommabop kalit so'zlarni avtomatik yarating.</p>
+            <div class="input-group">
+                <input type="text" id="tag-input" placeholder="Masalan: Anime edit, Python bot build">
+                <button class="action-btn" onclick="generateTags()">Taglarni chiqarish</button>
+            </div>
+            <div class="result-box" id="tag-result">Kalit so'zlar ro'yxati...</div>
+        </div>
+    </section>
+
+    <!-- 2. YANGI INTEGRATSIYA: REAL ANALYTICS & VALUE PROPOSITION DASHBOARD -->
+    <div class="dashboard-analytics-grid">
+        
+        <!-- Nega YouTubeFlow Pro? (Foyda va qiymat bloki) -->
+        <div class="pro-card">
+            <h3><i class="fas fa-rocket"></i> Nega aynan YouTubeFlow Pro?</h3>
+            <div class="benefits-list">
+                <div class="benefit-item">
+                    <i class="fas fa-bolt"></i>
+                    <p><strong>Kanal o'sish tezligi:</strong> Aqlli algoritmlar video yuklangandan keyingi dastlabki 24 soat ichida auditoriya qiziqishini tahlil qilib beradi.</p>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-chart-pie"></i>
+                    <p><strong>Aniq CTR tahlili:</strong> Qaysi muqova (thumbnail) va sarlavhalar ko'proq bosilayotganini real vaqt rejimida solishtiring.</p>
+                </div>
+                <div class="benefit-item">
+                    <i class="fab fa-telegram-plane"></i>
+                    <p><strong>Avtomatik bildirishnomalar:</strong> Kanal statistikasi va tomoshabinlar faolligi keskin o'zgarganda to'g'ridan-to'g'ri hisobot oling.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jonli Grafik Bloki (Chart.js bilan) -->
+        <div class="pro-card">
+            <div class="chart-header">
+                <h3><i class="fas fa-chart-line"></i> Tomoshabinlar faolligi</h3>
+                <span class="badge-live"><span class="dot"></span> Jonli Grafik</span>
+            </div>
+            <div style="position: relative; height: 180px; width: 100%;">
+                <canvas id="liveGrowthChart"></canvas>
+            </div>
+        </div>
+
+        <!-- AI Demo Hisoboti (Sample Report) -->
+        <div class="pro-card">
+            <h3><i class="fas fa-robot"></i> AI Analitika va Tavsiyalar</h3>
+            <p class="sample-desc">Kanal ulanishi bilan sun'iy intellekt sizga xuddi shu tartibda haftalik tahliliy tavsiyalar bera boshlaydi:</p>
+            
+            <div class="sample-report-box">
+                <div class="report-meta-header">
+                    <span class="report-tag">AI Hisoboti</span>
+                    <span class="report-impact">Tavsiya etilgan</span>
+                </div>
+                <p class="report-text">"Sizning kanalingizda <strong>Retentsiya (tomoshabin ushlab turish)</strong> ko'rsatkichi 3-daqiqada pasaymoqda. Keyingi videolarda dinamik montaj va ovoz effektlarini shu qismda kuchaytiring."</p>
+                <div class="report-footer-growth">
+                    <i class="fas fa-arrow-trend-up"></i> Kutilayotgan samaradorlik: +18% tomosha vaqti
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    /* 1. TAB MENYU FUNKSIYALARI (O'ZGARMAGAN) */
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+            tabcontent[i].classList.remove("active");
+        }
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        document.getElementById(tabName).style.display = "block";
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    /* MAVJUD ALOHIDA FUNKSIYALAR LOGIKASI (Yaxshi ishlayotgan qismlari) */
+    function runSeoAnalysis() {
+        let input = document.getElementById('seo-input').value;
+        let resultBox = document.getElementById('seo-result');
+        if(!input) { resultBox.innerHTML = "<span style='color:red;'>Iltimos havola kiriting!</span>"; return; }
+        
+        resultBox.innerHTML = "⌛ SEO skanerlanmoqda...";
+        setTimeout(() => {
+            resultBox.innerHTML = "<strong>✅ SEO Bahosi: 85/100</strong><br>• Sarlavha uzunligi: Yaxshi<br>• Kalit so'zlar zichligi: Optimal<br>• Tavsif (Description): Yana 2 ta kalit so'z qo'shish tavsiya etiladi.";
+        }, 1200);
+    }
+
+    function fetchThumbnail() {
+        let input = document.getElementById('thumb-input').value;
+        let resultBox = document.getElementById('thumb-result');
+        if(!input) { resultBox.innerHTML = "<span style='color:red;'>Iltimos video havola yoki ID kiriting!</span>"; return; }
+        
+        resultBox.innerHTML = "🔍 Tasvir qidirilmoqda...";
+        setTimeout(() => {
+            resultBox.innerHTML = "<strong>🖼 Max HD Sifat topildi:</strong><br><a href='#' style='color:#ff0055; text-decoration:underline;'>Thumbnail_HD_Quality.jpg yuklab olish</a>";
+        }, 1000);
+    }
+
+    function generateTags() {
+        let input = document.getElementById('tag-input').value;
+        let resultBox = document.getElementById('tag-result');
+        if(!input) { resultBox.innerHTML = "<span style='color:red;'>Mavzu kiriting!</span>"; return; }
+        
+        resultBox.innerHTML = "⚙️ Teglar shakllantirilmoqda...";
+        setTimeout(() => {
+            resultBox.innerHTML = "<code style='background:rgba(255,255,255,0.1); padding:5px; border-radius:4px;'>" + input.toLowerCase().replace(/ /g, ", ") + ", viral video, youtube flow pro</code>";
+        }, 900);
+    }
+
+    /* 2. JONLI CHART.JS GRAFIK INTEGRATSIYASI */
+    document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById('liveGrowthChart');
+        
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Du', 'Se', 'Cho', 'Pay', 'Ju', 'Sha', 'Yak'],
+                    datasets: [{
+                        label: 'Tomosha vaqti (soat)',
+                        data: [420, 580, 710, 940, 890, 1150, 1320], 
+                        borderColor: '#ff0055', 
+                        backgroundColor: 'rgba(255, 0, 85, 0.08)',
+                        borderWidth: 3,
+                        tension: 0.4, 
+                        fill: true,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#ff0055',
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false 
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#888888', font: { size: 10 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#888888', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
